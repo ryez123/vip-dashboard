@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Hospitality Reinvestment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #F0D98A;
+    --gold-dim: #8A6B28;
+    --onyx: #0E0E0E;
+    --surface: #161616;
+    --surface2: #1E1E1E;
+    --surface3: #252525;
+    --border: rgba(201,168,76,0.18);
+    --border-strong: rgba(201,168,76,0.38);
+    --text: #F0EDE6;
+    --text-muted: #8A8680;
+    --text-dim: #4A4845;
+    --red: #E05252;
+    --green: #4CAF82;
+    --blue: #5B9BD5;
+    --amber: #E09840;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--onyx); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  /* HEADER */
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px 16px; border-bottom: 0.5px solid var(--border); background: var(--surface); }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo-mark { width: 36px; height: 36px; border-radius: 8px; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 700; color: var(--onyx); flex-shrink: 0; }
+  .header-title { font-family: 'Libre Baskerville', serif; font-size: 17px; font-weight: 400; color: var(--text); }
+  .header-subtitle { font-size: 11px; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 1px; }
+  .data-badge { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); background: rgba(201,168,76,0.1); border: 0.5px solid var(--border); padding: 4px 10px; border-radius: 20px; letter-spacing: 0.4px; }
+
+  /* NAV TABS */
+  .nav-tabs { display: flex; gap: 0; background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 0 32px; }
+  .nav-tab { font-size: 13px; font-weight: 500; color: var(--text-muted); padding: 12px 18px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.18s; letter-spacing: 0.2px; display: flex; align-items: center; gap: 7px; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .nav-tab i { font-size: 13px; }
+
+  /* SEARCH SECTION */
+  .search-section { padding: 24px 32px 20px; background: var(--surface); border-bottom: 0.5px solid var(--border); }
+  .search-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .search-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .search-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; max-width: 340px; }
+  .search-group label { font-size: 12px; color: var(--text-muted); }
+  .search-input-wrap { position: relative; }
+  .search-input-wrap i.icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 14px; pointer-events: none; }
+  input[type="text"], select { width: 100%; background: var(--surface2); border: 0.5px solid var(--border-strong); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 9px 12px 9px 36px; border-radius: var(--radius); outline: none; transition: border-color 0.2s; -webkit-appearance: none; appearance: none; }
+  input[type="text"]:focus, select:focus { border-color: var(--gold); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C9A84C' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  select option { background: #1E1E1E; }
+  .date-group { display: flex; gap: 8px; align-items: center; }
+  .date-group label { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  input[type="date"] { background: var(--surface2); border: 0.5px solid var(--border-strong); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 9px 12px; border-radius: var(--radius); outline: none; transition: border-color 0.2s; color-scheme: dark; -webkit-appearance: none; }
+  input[type="date"]:focus { border-color: var(--gold); }
+  .btn-search { background: var(--gold); color: var(--onyx); border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 10px 22px; border-radius: var(--radius); cursor: pointer; transition: opacity 0.15s, transform 0.1s; white-space: nowrap; display: flex; align-items: center; gap: 6px; align-self: flex-end; }
+  .btn-search:hover { opacity: 0.88; }
+  .btn-search:active { transform: scale(0.97); }
+
+  /* AUTOCOMPLETE */
+  .autocomplete-wrap { position: relative; }
+  .autocomplete-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface3); border: 0.5px solid var(--border-strong); border-radius: var(--radius); z-index: 100; max-height: 200px; overflow-y: auto; display: none; }
+  .autocomplete-list.open { display: block; }
+  .ac-item { padding: 9px 14px; font-size: 13px; cursor: pointer; border-bottom: 0.5px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+  .ac-item:hover { background: rgba(201,168,76,0.12); color: var(--gold-light); }
+  .ac-item:last-child { border-bottom: none; }
+
+  /* MAIN */
+  .main { padding: 28px 32px; }
+
+  /* STATE PANELS */
+  .state-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-muted); gap: 12px; }
+  .state-panel i { font-size: 32px; color: var(--text-dim); }
+  .state-panel p { font-size: 14px; }
+  .state-panel .hint { font-size: 12px; color: var(--text-dim); }
+
+  /* VIP BANNER */
+  .vip-banner { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 0.5px solid var(--border); }
+  .vip-avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-dim), var(--gold)); display: flex; align-items: center; justify-content: center; font-family: 'Libre Baskerville', serif; font-size: 18px; font-weight: 700; color: var(--onyx); flex-shrink: 0; }
+  .vip-name { font-family: 'Libre Baskerville', serif; font-size: 22px; font-weight: 400; }
+  .vip-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .vip-meta span { color: var(--gold); font-family: 'DM Mono', monospace; }
+
+  /* STAT GRID */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent-color, var(--gold)); opacity: 0.6; }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
+  .stat-value { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; color: var(--text); line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* TWO COL */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* SECTION CARDS */
+  .section-card { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 0.5px solid var(--border); background: var(--surface3); }
+  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); font-weight: 500; }
+  .section-badge { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .section-body { padding: 16px 18px; }
+
+  /* BREAKDOWN */
+  .breakdown-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-label { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--text-muted); }
+  .breakdown-label i { width: 16px; color: var(--gold); font-size: 13px; }
+  .breakdown-values { display: flex; gap: 14px; align-items: center; }
+  .bv-count { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-dim); min-width: 24px; text-align: right; }
+  .bv-spend { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); min-width: 80px; text-align: right; }
+
+  /* NO-SHOW */
+  .noshow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 18px; }
+  .ns-item { background: var(--surface3); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+  .ns-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .ns-value { font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); }
+  .ns-value.warn { color: var(--red); }
+
+  /* GGR */
+  .ggr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 18px; }
+  .ggr-item { padding: 10px 12px; background: var(--surface3); border: 0.5px solid var(--border); border-radius: var(--radius); }
+  .ggr-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 4px; }
+  .ggr-value { font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); }
+  .ggr-value.warn { color: var(--amber); }
+  .roi-flag { margin: 0 18px 16px; padding: 10px 14px; border-radius: var(--radius); display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+  .roi-flag.no-data { background: rgba(90,90,90,0.18); color: var(--text-muted); border: 0.5px solid rgba(255,255,255,0.08); }
+
+  /* CHART */
+  .chart-section { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 24px; overflow: hidden; }
+  .chart-body { padding: 18px; }
+
+  /* TRANSACTIONS */
+  .txn-section { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px; }
+  .txn-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--surface3); }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+  td { padding: 10px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.04); color: var(--text-muted); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(201,168,76,0.04); }
+  .td-date { font-family: 'DM Mono', monospace; font-size: 12px; white-space: nowrap; }
+  .td-cat { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 20px; }
+  .cat-hotel { background: rgba(91,155,213,0.15); color: #7DAEDC; }
+  .cat-dining { background: rgba(201,168,76,0.15); color: var(--gold-light); }
+  .cat-event { background: rgba(76,175,130,0.15); color: #6ECFA0; }
+  .cat-merch { background: rgba(180,130,220,0.15); color: #C89EE0; }
+  .cat-ticket { background: rgba(224,152,64,0.15); color: #EDB870; }
+  .cat-other { background: rgba(100,100,100,0.15); color: #999; }
+  .td-spend { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); text-align: right; }
+
+  /* FILTER BAR */
+  .filter-bar { display: flex; gap: 8px; align-items: center; padding: 10px 18px; background: var(--surface3); border-bottom: 0.5px solid var(--border); flex-wrap: wrap; }
+  .filter-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; }
+  .filter-btn { background: transparent; border: 0.5px solid var(--border); color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 4px 12px; border-radius: 20px; cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold-light); }
+
+  /* ── TOP VIPs LEADERBOARD ── */
+  .top-controls { display: flex; align-items: center; gap: 12px; padding: 20px 0 16px; flex-wrap: wrap; }
+  .top-controls label { font-size: 12px; color: var(--text-muted); }
+  .top-controls input[type="date"] { width: auto; }
+  .btn-refresh { background: transparent; border: 0.5px solid var(--border-strong); color: var(--gold); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: var(--radius); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+  .btn-refresh:hover { background: rgba(201,168,76,0.08); }
+
+  .leaderboard-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .leaderboard-wrap { grid-template-columns: 1fr; } }
+
+  .lb-table-section { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .lb-row { display: flex; align-items: center; gap: 12px; padding: 11px 18px; border-bottom: 0.5px solid rgba(255,255,255,0.04); transition: background 0.1s; cursor: pointer; }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: rgba(201,168,76,0.05); }
+  .lb-row.top3 .lb-rank { color: var(--gold); }
+  .lb-rank { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-dim); width: 24px; flex-shrink: 0; text-align: center; }
+  .lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--surface3); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Libre Baskerville', serif; font-size: 11px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+  .lb-row.top3 .lb-avatar { background: rgba(201,168,76,0.12); border-color: var(--border-strong); }
+  .lb-name { flex: 1; font-size: 13px; color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lb-spend { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); text-align: right; flex-shrink: 0; }
+  .lb-bar-wrap { width: 80px; flex-shrink: 0; }
+  .lb-bar-track { background: var(--surface3); border-radius: 2px; height: 4px; overflow: hidden; }
+  .lb-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; opacity: 0.7; }
+  .lb-row.top3 .lb-bar-fill { opacity: 1; }
+
+  /* MEDAL ICONS */
+  .medal-1::after { content: '🥇'; font-size: 14px; }
+  .medal-2::after { content: '🥈'; font-size: 14px; }
+  .medal-3::after { content: '🥉'; font-size: 14px; }
+
+  /* CHART FOR TOP VIPs */
+  .lb-chart-section { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+
+  /* SUMMARY ROW */
+  .top-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+
+  /* MISC */
+  .spinner { width: 20px; height: 20px; border: 2px solid rgba(201,168,76,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface3); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; color: var(--text); z-index: 999; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { border-color: rgba(224,82,82,0.4); color: var(--red); }
+  .hidden { display: none !important; }
+  .fade-in { animation: fadeIn 0.35s ease forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .clickable-name { color: var(--gold-light); text-decoration: underline; text-decoration-color: rgba(201,168,76,0.3); cursor: pointer; }
+  .clickable-name:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">HR</div>
+    <div>
+      <div class="header-title">Hospitality Reinvestment</div>
+      <div class="header-subtitle">VIP Intelligence Dashboard</div>
+    </div>
+  </div>
+  <div class="data-badge" id="data-badge">
+    <i class="fa-solid fa-circle-notch fa-spin" style="font-size:10px; margin-right:4px;"></i>Loading data…
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab active" id="tab-search" onclick="switchTab('search')">
+    <i class="fa-solid fa-magnifying-glass"></i> VIP Search
+  </div>
+  <div class="nav-tab" id="tab-top" onclick="switchTab('top')">
+    <i class="fa-solid fa-ranking-star"></i> Top VIPs
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB: VIP SEARCH                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="view-search">
+  <div class="search-section">
+    <div class="search-label">Search VIP</div>
+    <div class="search-row">
+      <div class="search-group">
+        <label>Name search</label>
+        <div class="search-input-wrap autocomplete-wrap">
+          <i class="fa-solid fa-magnifying-glass icon"></i>
+          <input type="text" id="search-input" placeholder="Type a name…" autocomplete="off">
+          <div class="autocomplete-list" id="ac-list"></div>
+        </div>
+      </div>
+      <div class="search-group">
+        <label>Select VIP</label>
+        <div class="search-input-wrap">
+          <i class="fa-solid fa-user-tie icon"></i>
+          <select id="vip-select"><option value="">— select a VIP —</option></select>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label style="font-size:12px;color:var(--text-muted);">Date range</label>
+        <div class="date-group">
+          <label>From</label>
+          <input type="date" id="date-start" value="2026-01-01">
+          <label>To</label>
+          <input type="date" id="date-end">
+        </div>
+      </div>
+      <button class="btn-search" id="btn-search">
+        <i class="fa-solid fa-bolt"></i> Run
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="state-panel" id="state-empty">
+      <i class="fa-regular fa-id-card"></i>
+      <p>Search for a VIP to load their hospitality profile</p>
+      <p class="hint">Type a name above, select from the dropdown, and click Run</p>
+    </div>
+    <div id="state-loading" class="state-panel hidden">
+      <div class="spinner"></div>
+      <p>Pulling hospitality records…</p>
+    </div>
+
+    <div id="dashboard" class="hidden">
+      <div class="vip-banner fade-in" id="vip-banner"></div>
+      <div class="stat-grid fade-in" id="stat-grid"></div>
+
+      <div class="two-col fade-in">
+        <div class="section-card">
+          <div class="section-head">
+            <span class="section-title">Hospitality breakdown</span>
+            <span class="section-badge" id="bd-total-spend"></span>
+          </div>
+          <div class="section-body" id="breakdown-body"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="section-card">
+            <div class="section-head"><span class="section-title">No-show summary</span></div>
+            <div class="noshow-grid" id="noshow-grid"></div>
+          </div>
+          <div class="section-card">
+            <div class="section-head"><span class="section-title">Player GGR</span></div>
+            <div class="ggr-grid" id="ggr-grid"></div>
+            <div class="roi-flag no-data" id="roi-flag" style="display:flex;">
+              <i class="fa-solid fa-circle-info"></i> No GGR data available for this player
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-section fade-in">
+        <div class="section-head">
+          <span class="section-title">Spend over time</span>
+          <span class="section-badge" id="chart-badge"></span>
+        </div>
+        <div class="chart-body">
+          <div style="position:relative;width:100%;height:200px;">
+            <canvas id="spend-chart" role="img" aria-label="Monthly hospitality spend for selected VIP"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="txn-section fade-in">
+        <div class="section-head">
+          <span class="section-title">Transaction detail</span>
+          <span class="section-badge" id="txn-count-badge"></span>
+        </div>
+        <div class="filter-bar" id="cat-filters"></div>
+        <div class="txn-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th><th>Category</th><th>Description</th>
+                <th style="text-align:right;">Count</th>
+                <th style="text-align:right;">Spend</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody id="txn-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB: TOP VIPs                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="view-top" class="hidden">
+  <div class="search-section">
+    <div class="search-label">Date range &amp; ranking</div>
+    <div class="search-row">
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label style="font-size:12px;color:var(--text-muted);">Date range</label>
+        <div class="date-group">
+          <label>From</label>
+          <input type="date" id="top-date-start">
+          <label>To</label>
+          <input type="date" id="top-date-end">
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label style="font-size:12px;color:var(--text-muted);">Show top</label>
+        <div class="search-input-wrap" style="width:110px;">
+          <i class="fa-solid fa-list-ol icon"></i>
+          <select id="top-n-select" style="padding-left:32px;">
+            <option value="10">Top 10</option>
+            <option value="25" selected>Top 25</option>
+            <option value="50">Top 50</option>
+            <option value="100">Top 100</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label style="font-size:12px;color:var(--text-muted);">Category</label>
+        <div class="search-input-wrap" style="width:160px;">
+          <i class="fa-solid fa-layer-group icon"></i>
+          <select id="top-cat-select" style="padding-left:32px;">
+            <option value="All">All categories</option>
+            <option value="Hotel">Hotel</option>
+            <option value="Dining">Dining</option>
+            <option value="Event">Event</option>
+            <option value="Merchandise">Merchandise</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-search" id="btn-top-refresh" onclick="renderTopVIPs()">
+        <i class="fa-solid fa-arrow-rotate-right"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="top-loading" class="state-panel hidden">
+      <div class="spinner"></div><p>Calculating rankings…</p>
+    </div>
+
+    <div id="top-content" class="hidden">
+      <!-- Summary stats -->
+      <div class="top-summary fade-in" id="top-summary"></div>
+
+      <div class="leaderboard-wrap fade-in">
+        <!-- Ranked list -->
+        <div class="lb-table-section">
+          <div class="section-head">
+            <span class="section-title" id="lb-title">Top 25 VIPs by spend</span>
+            <span class="section-badge" id="lb-period"></span>
+          </div>
+          <div id="lb-list"></div>
+        </div>
+
+        <!-- Bar chart -->
+        <div class="lb-chart-section">
+          <div class="section-head">
+            <span class="section-title">Spend distribution</span>
+            <span class="section-badge">click a row to drill in</span>
+          </div>
+          <div class="chart-body">
+            <div style="position:relative;width:100%;height:520px;">
+              <canvas id="top-chart" role="img" aria-label="Top VIPs by total hospitality spend"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_ID = '1o8IvtNBDXV-DNzQpJAnCG3c85VrlMjX0a_raLjBnVBs';
+const SHEET_NAME = 'All_Activity';
+
+let allRows = [];
+let vipMap = {};
+let spendChart = null;
+let topChart = null;
+let activeFilters = new Set(['All']);
+
+// ── UTILITIES ──
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError?' error':'');
+  setTimeout(() => t.className='toast', 3200);
+}
+
+function parseCSV(text) {
+  const lines = text.split('\n');
+  const headers = [];
+  let inQ=false, cur='';
+  for (let c=0;c<lines[0].length;c++) {
+    if (lines[0][c]==='"') { inQ=!inQ; }
+    else if (lines[0][c]===',' && !inQ) { headers.push(cur.trim()); cur=''; }
+    else cur+=lines[0][c];
+  }
+  headers.push(cur.trim());
+
+  const rows=[];
+  for (let i=1;i<lines.length;i++) {
+    const line=lines[i].trim(); if (!line) continue;
+    const vals=[]; inQ=false; cur='';
+    for (let c=0;c<line.length;c++) {
+      if (line[c]==='"') { inQ=!inQ; }
+      else if (line[c]===',' && !inQ) { vals.push(cur); cur=''; }
+      else cur+=line[c];
+    }
+    vals.push(cur);
+    const row={};
+    headers.forEach((h,idx) => row[h]=(vals[idx]||'').replace(/^"|"$/g,'').trim());
+    rows.push(row);
+  }
+  return rows;
+}
+
+function parseMoney(s) { return parseFloat((s||'0').replace(/[$,]/g,''))||0; }
+function fmtMoney(n) { return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtMoneyShort(n) { if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M'; if(n>=1000) return '$'+(n/1000).toFixed(1)+'k'; return '$'+Math.round(n); }
+function getInitials(name) { const p=name.trim().split(' ').filter(Boolean); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():name.slice(0,2).toUpperCase(); }
+function catIcon(cat) { const c=(cat||'').toLowerCase(); if(c==='hotel') return 'fa-bed'; if(c==='dining') return 'fa-utensils'; if(c==='event') return 'fa-ticket'; if(c==='merchandise') return 'fa-bag-shopping'; if(c.includes('ticket')) return 'fa-ticket-simple'; return 'fa-circle-dot'; }
+function catStyle(cat) { const c=(cat||'').toLowerCase(); if(c==='hotel') return 'cat-hotel'; if(c==='dining') return 'cat-dining'; if(c==='event') return 'cat-event'; if(c==='merchandise') return 'cat-merch'; if(c.includes('ticket')) return 'cat-ticket'; return 'cat-other'; }
+function parseDate(s) { return s?new Date(s):null; }
+
+// ── TABS ──
+function switchTab(tab) {
+  document.getElementById('view-search').classList.toggle('hidden', tab!=='search');
+  document.getElementById('view-top').classList.toggle('hidden', tab!=='top');
+  document.getElementById('tab-search').classList.toggle('active', tab==='search');
+  document.getElementById('tab-top').classList.toggle('active', tab==='top');
+  if (tab==='top' && allRows.length && document.getElementById('top-content').classList.contains('hidden')) {
+    renderTopVIPs();
+  }
+}
+
+// ── LOAD DATA via Google Visualization API (works from local file://) ──
+function loadData() {
+  const callbackName = 'gvizCallback_' + Date.now();
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=select%20*&sheet=${encodeURIComponent(SHEET_NAME)}&tqx=responseHandler:${callbackName}`;
+
+  window[callbackName] = function(data) {
+    try {
+      delete window[callbackName];
+      document.head.removeChild(script);
+
+      const cols = data.table.cols.map(c => c.label);
+      allRows = data.table.rows.map(row => {
+        const r = {};
+        cols.forEach((col, i) => {
+          const cell = row.c[i];
+          if (!cell || cell.v === null || cell.v === undefined) { r[col] = ''; return; }
+          // Date cells come as Date objects from gviz
+          if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
+            const parts = cell.v.slice(5,-1).split(',').map(Number);
+            const d = new Date(parts[0], parts[1], parts[2]);
+            r[col] = `${parts[1]+1}/${parts[2]}/${parts[0]}`;
+          } else {
+            r[col] = cell.f !== undefined && cell.f !== null ? cell.f : String(cell.v);
+          }
+        });
+        return r;
+      });
+
+      allRows.forEach(r => {
+        const norm=(r.VIP_Normalized||r.VIP||'').toLowerCase().trim();
+        const display=r.VIP||norm;
+        if (norm && !vipMap[norm]) vipMap[norm]=display;
+      });
+
+      const sorted=Object.entries(vipMap).sort((a,b)=>a[0].localeCompare(b[0]));
+      const sel=document.getElementById('vip-select');
+      sorted.forEach(([norm,display])=>{
+        const opt=document.createElement('option');
+        opt.value=norm; opt.textContent=display; sel.appendChild(opt);
+      });
+
+      document.getElementById('data-badge').innerHTML=
+        `<i class="fa-solid fa-circle-check" style="font-size:10px;color:var(--green);margin-right:4px;"></i>${allRows.length.toLocaleString()} records`;
+
+      const dates=allRows.map(r=>r.Date).filter(Boolean).sort((a,b)=>new Date(a)-new Date(b));
+      if (dates.length) {
+        const s=toInputDate(dates[0]), e=toInputDate(dates[dates.length-1]);
+        document.getElementById('date-start').value=s;
+        document.getElementById('date-end').value=e;
+        document.getElementById('top-date-start').value=s;
+        document.getElementById('top-date-end').value=e;
+      }
+    } catch(err) {
+      onLoadError();
+    }
+  };
+
+  function onLoadError() {
+    document.getElementById('data-badge').innerHTML=
+      `<i class="fa-solid fa-triangle-exclamation" style="font-size:10px;color:var(--red);margin-right:4px;"></i>Sheet not accessible`;
+    showToast('Make sure the sheet is shared as "Anyone with the link → Viewer"', true);
+  }
+
+  const script = document.createElement('script');
+  script.src = url;
+  script.onerror = onLoadError;
+  document.head.appendChild(script);
+}
+
+function toInputDate(s) { const d=new Date(s); return isNaN(d)?'':d.toISOString().slice(0,10); }
+
+// ── AUTOCOMPLETE ──
+const searchInput = document.getElementById('search-input');
+const acList = document.getElementById('ac-list');
+const vipSelect = document.getElementById('vip-select');
+
+searchInput.addEventListener('input', () => {
+  const q=searchInput.value.toLowerCase().trim();
+  acList.innerHTML='';
+  if (!q||q.length<2) { acList.classList.remove('open'); return; }
+  const matches=Object.entries(vipMap).filter(([n])=>n.includes(q)).slice(0,10);
+  if (!matches.length) { acList.classList.remove('open'); return; }
+  matches.forEach(([norm,display])=>{
+    const item=document.createElement('div');
+    item.className='ac-item'; item.textContent=display;
+    item.addEventListener('click',()=>{ searchInput.value=display; vipSelect.value=norm; acList.classList.remove('open'); });
+    acList.appendChild(item);
+  });
+  acList.classList.add('open');
+});
+document.addEventListener('click', e=>{ if(!e.target.closest('.autocomplete-wrap')) acList.classList.remove('open'); });
+vipSelect.addEventListener('change',()=>{ const n=vipSelect.value; if(n&&vipMap[n]) searchInput.value=vipMap[n]; });
+
+// ── SEARCH RUN ──
+document.getElementById('btn-search').addEventListener('click', runSearch);
+
+function runSearch(prefillNorm) {
+  const norm = (typeof prefillNorm==='string') ? prefillNorm : vipSelect.value;
+  if (!norm) { showToast('Select a VIP first', true); return; }
+
+  // sync UI if called from leaderboard click
+  if (typeof prefillNorm==='string') {
+    vipSelect.value=norm;
+    if (vipMap[norm]) searchInput.value=vipMap[norm];
+    switchTab('search');
+  }
+
+  const startVal=document.getElementById('date-start').value;
+  const endVal=document.getElementById('date-end').value;
+  const startDate=startVal?new Date(startVal):null;
+  const endDate=endVal?new Date(endVal+'T23:59:59'):null;
+
+  document.getElementById('state-empty').classList.add('hidden');
+  document.getElementById('state-loading').classList.remove('hidden');
+  document.getElementById('dashboard').classList.add('hidden');
+
+  setTimeout(()=>{
+    const rows=allRows.filter(r=>{
+      const rn=(r.VIP_Normalized||r.VIP||'').toLowerCase().trim();
+      if(rn!==norm) return false;
+      const d=parseDate(r.Date);
+      if(startDate&&d&&d<startDate) return false;
+      if(endDate&&d&&d>endDate) return false;
+      return true;
+    });
+    document.getElementById('state-loading').classList.add('hidden');
+    renderDashboard(rows, vipMap[norm]||norm, startVal, endVal);
+  }, 80);
+}
+
+// ── VIP DASHBOARD ──
+function renderDashboard(rows, vipName, startVal, endVal) {
+  document.getElementById('vip-banner').innerHTML=`
+    <div class="vip-avatar">${getInitials(vipName)}</div>
+    <div>
+      <div class="vip-name">${vipName}</div>
+      <div class="vip-meta"><span>${rows.length}</span> transactions &nbsp;·&nbsp; Period: <span>${startVal||'—'}</span> → <span>${endVal||'—'}</span></div>
+    </div>`;
+
+  const catMap={};
+  let totalSpend=0, totalCount=0;
+  rows.forEach(r=>{
+    const cat=r.Category||'Other';
+    if(!catMap[cat]) catMap[cat]={count:0,spend:0};
+    const spend=parseMoney(r.Spend), cnt=parseInt(r.Count)||1;
+    catMap[cat].count+=cnt; catMap[cat].spend+=spend;
+    totalSpend+=spend; totalCount+=cnt;
+  });
+
+  const hotelSpend=(catMap['Hotel']||{spend:0}).spend;
+  const diningSpend=(catMap['Dining']||{spend:0}).spend;
+  const hotelCount=(catMap['Hotel']||{count:0}).count;
+  const diningCount=(catMap['Dining']||{count:0}).count;
+
+  document.getElementById('stat-grid').innerHTML=
+    statCard('Total Spend',fmtMoney(totalSpend),`${totalCount} items`,'--gold')+
+    statCard('Hotel',fmtMoney(hotelSpend),`${hotelCount} stay${hotelCount!==1?'s':''}`,'--blue')+
+    statCard('Dining',fmtMoney(diningSpend),`${diningCount} reservation${diningCount!==1?'s':''}`,'--amber')+
+    statCard('Transactions',totalCount,`across ${Object.keys(catMap).length} categories`,'--text-muted');
+
+  document.getElementById('bd-total-spend').textContent=fmtMoney(totalSpend);
+  const catList=['Hotel','Dining','Merchandise','Event','One-Off Ticket'];
+  document.getElementById('breakdown-body').innerHTML=catList.map(cat=>{
+    const d=catMap[cat]||{count:0,spend:0};
+    return `<div class="breakdown-row">
+      <div class="breakdown-label"><i class="fa-solid ${catIcon(cat)}"></i>${cat}</div>
+      <div class="breakdown-values"><span class="bv-count">${d.count}</span><span class="bv-spend">${fmtMoney(d.spend)}</span></div>
+    </div>`;
+  }).join('');
+
+  const hotelNS=rows.filter(r=>r.Category==='Hotel'&&/no.?show/i.test(r.Description||'')).length;
+  const eventNS=rows.filter(r=>r.Category==='Event'&&/no.?show/i.test(r.Description||'')).length;
+  const hotelNSCost=rows.filter(r=>r.Category==='Hotel'&&/no.?show/i.test(r.Description||'')).reduce((s,r)=>s+parseMoney(r.Spend),0);
+  const eventNSCost=rows.filter(r=>r.Category==='Event'&&/no.?show/i.test(r.Description||'')).reduce((s,r)=>s+parseMoney(r.Spend),0);
+  document.getElementById('noshow-grid').innerHTML=
+    nsItem('Hotel no-shows',hotelNS,hotelNS>0)+nsItem('Hotel NS cost',fmtMoney(hotelNSCost),hotelNSCost>0)+
+    nsItem('Event no-shows',eventNS,eventNS>0)+nsItem('Event NS cost',fmtMoney(eventNSCost),eventNSCost>0)+
+    nsItem('Total no-shows',hotelNS+eventNS,(hotelNS+eventNS)>0)+nsItem('Total NS cost',fmtMoney(hotelNSCost+eventNSCost),(hotelNSCost+eventNSCost)>0);
+
+  document.getElementById('ggr-grid').innerHTML=
+    ggrItem('GGR 1Y','$0.00','')+ggrItem('GGR 90D','$0.00','')+
+    ggrItem('LTV 365D','$0.00','')+ggrItem('Reinvest %','No GGR','warn');
+
+  // Chart
+  const monthMap={};
+  rows.forEach(r=>{ const d=parseDate(r.Date); if(!d) return; const k=d.toLocaleDateString('en-US',{month:'short',year:'numeric'}); monthMap[k]=(monthMap[k]||0)+parseMoney(r.Spend); });
+  const monthKeys=Object.keys(monthMap).sort((a,b)=>new Date(a)-new Date(b));
+  document.getElementById('chart-badge').textContent=monthKeys.length+' months';
+  if(spendChart){spendChart.destroy();spendChart=null;}
+  spendChart=new Chart(document.getElementById('spend-chart'),{
+    type:'bar',
+    data:{labels:monthKeys,datasets:[{label:'Spend',data:monthKeys.map(k=>monthMap[k]),backgroundColor:'rgba(201,168,76,0.55)',borderColor:'#C9A84C',borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmtMoney(ctx.raw)}}},
+      scales:{x:{ticks:{color:'#8A8680',font:{family:'DM Mono',size:11},autoSkip:false,maxRotation:45},grid:{color:'rgba(255,255,255,0.04)'}},
+              y:{ticks:{color:'#8A8680',font:{family:'DM Mono',size:11},callback:v=>fmtMoneyShort(v)},grid:{color:'rgba(255,255,255,0.06)'}}}}
+  });
+
+  // Category filter buttons
+  const allCats=['All',...new Set(rows.map(r=>r.Category||'Other').filter(Boolean))];
+  activeFilters=new Set(['All']);
+  const filtersEl=document.getElementById('cat-filters');
+  filtersEl.innerHTML='<span class="filter-label">Filter:</span>'+
+    allCats.map(cat=>`<button class="filter-btn ${cat==='All'?'active':''}" data-cat="${cat}">${cat}</button>`).join('');
+  filtersEl.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const cat=btn.dataset.cat;
+      if(cat==='All'){activeFilters=new Set(['All']);filtersEl.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat==='All'));}
+      else{activeFilters.delete('All');filtersEl.querySelector('[data-cat="All"]').classList.remove('active');
+        if(activeFilters.has(cat)){activeFilters.delete(cat);btn.classList.remove('active');}
+        else{activeFilters.add(cat);btn.classList.add('active');}
+        if(!activeFilters.size){activeFilters.add('All');filtersEl.querySelector('[data-cat="All"]').classList.add('active');}
+      }
+      renderTxns(rows);
+    });
+  });
+  renderTxns(rows);
+  document.getElementById('txn-count-badge').textContent=rows.length+' rows';
+  document.getElementById('dashboard').classList.remove('hidden');
+}
+
+function renderTxns(rows) {
+  const filtered=activeFilters.has('All')?rows:rows.filter(r=>activeFilters.has(r.Category||'Other'));
+  document.getElementById('txn-count-badge').textContent=filtered.length+' rows';
+  const tbody=document.getElementById('txn-body');
+  if(!filtered.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-dim);">No transactions found</td></tr>';return;}
+  tbody.innerHTML=filtered.sort((a,b)=>new Date(b.Date)-new Date(a.Date)).map(r=>`<tr>
+    <td class="td-date">${r.Date||'—'}</td>
+    <td><span class="td-cat ${catStyle(r.Category||'Other')}"><i class="fa-solid ${catIcon(r.Category||'Other')}" style="font-size:10px;"></i>${r.Category||'Other'}</span></td>
+    <td>${r.Description||'—'}</td>
+    <td style="text-align:right;font-family:'DM Mono',monospace;font-size:12px;">${r.Count||1}</td>
+    <td class="td-spend">${fmtMoney(parseMoney(r.Spend))}</td>
+    <td style="font-size:11px;color:var(--text-dim);">${r.Source||'—'}</td>
+  </tr>`).join('');
+}
+
+// ── TOP VIPs LEADERBOARD ──
+function renderTopVIPs() {
+  if (!allRows.length) { showToast('Data still loading…', true); return; }
+
+  const startVal=document.getElementById('top-date-start').value;
+  const endVal=document.getElementById('top-date-end').value;
+  const catFilter=document.getElementById('top-cat-select').value;
+  const topN=parseInt(document.getElementById('top-n-select').value)||25;
+  const startDate=startVal?new Date(startVal):null;
+  const endDate=endVal?new Date(endVal+'T23:59:59'):null;
+
+  // Aggregate by VIP_Normalized
+  const agg={};
+  allRows.forEach(r=>{
+    const d=parseDate(r.Date);
+    if(startDate&&d&&d<startDate) return;
+    if(endDate&&d&&d>endDate) return;
+    if(catFilter!=='All'&&r.Category!==catFilter) return;
+    const norm=(r.VIP_Normalized||r.VIP||'').toLowerCase().trim();
+    const display=r.VIP||norm;
+    if(!norm) return;
+    if(!agg[norm]) agg[norm]={display, spend:0, count:0, txns:0};
+    agg[norm].spend+=parseMoney(r.Spend);
+    agg[norm].count+=(parseInt(r.Count)||1);
+    agg[norm].txns++;
+  });
+
+  const sorted=Object.entries(agg).sort((a,b)=>b[1].spend-a[1].spend).slice(0,topN);
+  const maxSpend=sorted[0]?.[1].spend||1;
+  const totalSpend=sorted.reduce((s,[,v])=>s+v.spend,0);
+  const totalTxns=sorted.reduce((s,[,v])=>s+v.txns,0);
+
+  // Summary cards
+  document.getElementById('top-summary').innerHTML=
+    statCard('Total reinvested',fmtMoney(totalSpend),`top ${sorted.length} VIPs`,'--gold')+
+    statCard('Avg per VIP',fmtMoney(sorted.length?totalSpend/sorted.length:0),'mean spend','--blue')+
+    statCard('#1 VIP',sorted[0]?fmtMoney(sorted[0][1].spend):'—',sorted[0]?sorted[0][1].display:'—','--amber')+
+    statCard('Transactions',totalTxns,`across ${sorted.length} VIPs`,'--text-muted');
+
+  // List
+  document.getElementById('lb-title').textContent=`Top ${topN} VIPs by spend${catFilter!=='All'?' · '+catFilter:''}`;
+  document.getElementById('lb-period').textContent=(startVal&&endVal)?`${startVal} → ${endVal}`:'All time';
+
+  const medals=['medal-1','medal-2','medal-3'];
+  document.getElementById('lb-list').innerHTML=sorted.map(([norm,v],i)=>{
+    const pct=Math.round((v.spend/maxSpend)*100);
+    const rankDisplay=i<3?`<span class="${medals[i]}"></span>`:`<span>${i+1}</span>`;
+    return `<div class="lb-row ${i<3?'top3':''}" onclick="drillVIP('${norm.replace(/'/g,"\\'")}')">
+      <div class="lb-rank">${rankDisplay}</div>
+      <div class="lb-avatar">${getInitials(v.display)}</div>
+      <div class="lb-name" title="${v.display}">${v.display}</div>
+      <div class="lb-bar-wrap"><div class="lb-bar-track"><div class="lb-bar-fill" style="width:${pct}%"></div></div></div>
+      <div class="lb-spend">${fmtMoney(v.spend)}</div>
+    </div>`;
+  }).join('');
+
+  // Horizontal bar chart — top 15 for readability
+  const chartData=sorted.slice(0,15);
+  const chartH=Math.max(300, chartData.length*38+80);
+  document.getElementById('top-chart').parentElement.style.height=chartH+'px';
+  if(topChart){topChart.destroy();topChart=null;}
+  topChart=new Chart(document.getElementById('top-chart'),{
+    type:'bar',
+    data:{
+      labels:chartData.map(([,v])=>v.display.split(' ').slice(0,2).join(' ')),
+      datasets:[{
+        label:'Total Spend',
+        data:chartData.map(([,v])=>v.spend),
+        backgroundColor:chartData.map((_,i)=>i<3?'rgba(201,168,76,0.85)':'rgba(201,168,76,0.38)'),
+        borderColor:chartData.map((_,i)=>i<3?'#C9A84C':'rgba(201,168,76,0.5)'),
+        borderWidth:1, borderRadius:4,
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmtMoney(ctx.raw)}}},
+      scales:{
+        x:{ticks:{color:'#8A8680',font:{family:'DM Mono',size:11},callback:v=>fmtMoneyShort(v)},grid:{color:'rgba(255,255,255,0.05)'}},
+        y:{ticks:{color:'#8A8680',font:{family:'DM Sans',size:12}},grid:{display:false}}
+      }
+    }
+  });
+
+  document.getElementById('top-content').classList.remove('hidden');
+}
+
+function drillVIP(norm) {
+  // Switch to search tab and load that VIP
+  document.getElementById('date-start').value=document.getElementById('top-date-start').value;
+  document.getElementById('date-end').value=document.getElementById('top-date-end').value;
+  runSearch(norm);
+}
+
+// ── HELPERS ──
+function statCard(label,value,sub,accent) {
+  return `<div class="stat-card" style="--accent-color:var(${accent})">
+    <div class="stat-label">${label}</div>
+    <div class="stat-value">${value}</div>
+    <div class="stat-sub">${sub}</div>
+  </div>`;
+}
+function nsItem(label,value,isWarn) {
+  return `<div class="ns-item"><div class="ns-label">${label}</div><div class="ns-value${isWarn?' warn':''}">${value}</div></div>`;
+}
+function ggrItem(label,value,cls) {
+  return `<div class="ggr-item"><div class="ggr-label">${label}</div><div class="ggr-value${cls?' '+cls:''}">${value}</div></div>`;
+}
+
+// INIT
+document.getElementById('date-end').value=new Date().toISOString().slice(0,10);
+document.getElementById('top-date-end').value=new Date().toISOString().slice(0,10);
+loadData();
+</script>
+</body>
+</html>
