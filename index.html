@@ -720,6 +720,8 @@ function renderTopVIPs(){
   document.getElementById('top-content').classList.remove('hidden');
 }
 
+function drillVIPEncoded(el){drillVIP(decodeURIComponent(el.dataset.norm));}
+function drillVIPEl(el){drillVIP(decodeURIComponent(el.getAttribute('data-norm')));}
 function drillVIP(norm){
   document.getElementById('date-start').value=document.getElementById('top-date-start').value;
   document.getElementById('date-end').value=document.getElementById('top-date-end').value;
