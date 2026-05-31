@@ -649,7 +649,7 @@ function renderTxns(rows){
   tbody.innerHTML=filtered.sort((a,b)=>new Date(b.Date)-new Date(a.Date)).map(r=>
     '<tr><td class="td-date">'+(r.Date||'—')+'</td><td>'+catPill(r.Category||'Other')+'</td>'+
     '<td style="color:var(--text);">'+(r.Description||'—')+'</td>'+
-    '<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);">'+(r.Count||1)+'</td>'+
+    '<td style="text-align:right;font-family:monospace;font-size:12px;color:var(--text);">'+(r.Count||1)+'</td>'+
     '<td class="td-reinvested">'+fmtMoney(parseMoney(r.Spend))+'</td>'+
     '<td style="font-size:11px;color:var(--text-dim);">'+(r.Source||'—')+'</td></tr>'
   ).join('');
@@ -690,15 +690,21 @@ function renderTopVIPs(){
   document.getElementById('lb-period').textContent=(startVal&&endVal)?startVal+' → '+endVal:'All time';
 
   const medals=['🥇','🥈','🥉'];
-  document.getElementById('lb-list').innerHTML=sorted.map(([norm,v],i)=>{
-    const pct=Math.round((v.spend/maxSpend)*100);
-    return '<div class="lb-row '+(i<3?'top3':'')+'" onclick="drillVIP(''+norm.replace(/'/g,"\'")+'')">' +
+  const lbContainer = document.getElementById('lb-list');
+  lbContainer.innerHTML = '';
+  sorted.forEach(([norm,v],i) => {
+    const pct = Math.round((v.spend/maxSpend)*100);
+    const row = document.createElement('div');
+    row.className = 'lb-row' + (i<3 ? ' top3' : '');
+    row.innerHTML =
       '<div class="lb-rank">'+(i<3?medals[i]:i+1)+'</div>'+
       '<div class="lb-avatar">'+getInitials(v.display)+'</div>'+
       '<div class="lb-name" title="'+v.display+'">'+v.display+'</div>'+
       '<div class="lb-bar-wrap"><div class="lb-bar-track"><div class="lb-bar-fill" style="width:'+pct+'%"></div></div></div>'+
-      '<div class="lb-amount">'+fmtMoney(v.spend)+'</div></div>';
-  }).join('');
+      '<div class="lb-amount">'+fmtMoney(v.spend)+'</div>';
+    row.addEventListener('click', function(){ drillVIP(norm); });
+    lbContainer.appendChild(row);
+  });
 
   const chartData=sorted.slice(0,15);
   document.getElementById('top-chart').parentElement.style.height=Math.max(300,chartData.length*38+80)+'px';
