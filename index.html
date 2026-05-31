@@ -646,13 +646,18 @@ function renderTxns(rows){
   document.getElementById('txn-badge').textContent=filtered.length+' rows';
   const tbody=document.getElementById('txn-body');
   if(!filtered.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--text-dim);">No transactions found</td></tr>';return;}
-  tbody.innerHTML=filtered.sort((a,b)=>new Date(b.Date)-new Date(a.Date)).map(r=>
-    '<tr><td class="td-date">'+(r.Date||'—')+'</td><td>'+catPill(r.Category||'Other')+'</td>'+
-    '<td style="color:var(--text);">'+(r.Description||'—')+'</td>'+
-    '<td style="text-align:right;font-family:monospace;font-size:12px;color:var(--text);">'+(r.Count||1)+'</td>'+
-    '<td class="td-reinvested">'+fmtMoney(parseMoney(r.Spend))+'</td>'+
-    '<td style="font-size:11px;color:var(--text-dim);">'+(r.Source||'—')+'</td></tr>'
-  ).join('');
+  tbody.innerHTML='';
+  filtered.sort((a,b)=>new Date(b.Date)-new Date(a.Date)).forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td class="td-date">'+(r.Date||'—')+'</td>'+
+      '<td>'+catPill(r.Category||'Other')+'</td>'+
+      '<td style="color:var(--text);">'+(r.Description||'—')+'</td>'+
+      '<td style="text-align:right;font-family:monospace;font-size:12px;color:var(--text);">'+(r.Count||1)+'</td>'+
+      '<td class="td-reinvested">'+fmtMoney(parseMoney(r.Spend))+'</td>'+
+      '<td style="font-size:11px;color:var(--text-dim);">'+(r.Source||'—')+'</td>';
+    tbody.appendChild(tr);
+  });
 }
 
 function renderTopVIPs(){
