@@ -500,73 +500,44 @@ function switchTab(tab) {
   }
 }
 
-// ── LOAD DATA via Google Visualization API (works from local file://) ──
-function loadData() {
-  const callbackName = 'gvizCallback_' + Date.now();
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=select%20*&sheet=${encodeURIComponent(SHEET_NAME)}&tqx=responseHandler:${callbackName}`;
+// ── LOAD DATA via CSV fetch (works from GitHub Pages) ──
+async function loadData() {
+  const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    allRows = parseCSV(text);
 
-  window[callbackName] = function(data) {
-    try {
-      delete window[callbackName];
-      document.head.removeChild(script);
+    allRows.forEach(r => {
+      const norm=(r.VIP_Normalized||r.VIP||'').toLowerCase().trim();
+      const display=r.VIP||norm;
+      if (norm && !vipMap[norm]) vipMap[norm]=display;
+    });
 
-      const cols = data.table.cols.map(c => c.label);
-      allRows = data.table.rows.map(row => {
-        const r = {};
-        cols.forEach((col, i) => {
-          const cell = row.c[i];
-          if (!cell || cell.v === null || cell.v === undefined) { r[col] = ''; return; }
-          // Date cells come as Date objects from gviz
-          if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
-            const parts = cell.v.slice(5,-1).split(',').map(Number);
-            const d = new Date(parts[0], parts[1], parts[2]);
-            r[col] = `${parts[1]+1}/${parts[2]}/${parts[0]}`;
-          } else {
-            r[col] = cell.f !== undefined && cell.f !== null ? cell.f : String(cell.v);
-          }
-        });
-        return r;
-      });
+    const sorted=Object.entries(vipMap).sort((a,b)=>a[0].localeCompare(b[0]));
+    const sel=document.getElementById('vip-select');
+    sorted.forEach(([norm,display])=>{
+      const opt=document.createElement('option');
+      opt.value=norm; opt.textContent=display; sel.appendChild(opt);
+    });
 
-      allRows.forEach(r => {
-        const norm=(r.VIP_Normalized||r.VIP||'').toLowerCase().trim();
-        const display=r.VIP||norm;
-        if (norm && !vipMap[norm]) vipMap[norm]=display;
-      });
+    document.getElementById('data-badge').innerHTML=
+      `<i class="fa-solid fa-circle-check" style="font-size:10px;color:var(--green);margin-right:4px;"></i>${allRows.length.toLocaleString()} records`;
 
-      const sorted=Object.entries(vipMap).sort((a,b)=>a[0].localeCompare(b[0]));
-      const sel=document.getElementById('vip-select');
-      sorted.forEach(([norm,display])=>{
-        const opt=document.createElement('option');
-        opt.value=norm; opt.textContent=display; sel.appendChild(opt);
-      });
-
-      document.getElementById('data-badge').innerHTML=
-        `<i class="fa-solid fa-circle-check" style="font-size:10px;color:var(--green);margin-right:4px;"></i>${allRows.length.toLocaleString()} records`;
-
-      const dates=allRows.map(r=>r.Date).filter(Boolean).sort((a,b)=>new Date(a)-new Date(b));
-      if (dates.length) {
-        const s=toInputDate(dates[0]), e=toInputDate(dates[dates.length-1]);
-        document.getElementById('date-start').value=s;
-        document.getElementById('date-end').value=e;
-        document.getElementById('top-date-start').value=s;
-        document.getElementById('top-date-end').value=e;
-      }
-    } catch(err) {
-      onLoadError();
+    const dates=allRows.map(r=>r.Date).filter(Boolean).sort((a,b)=>new Date(a)-new Date(b));
+    if (dates.length) {
+      const s=toInputDate(dates[0]), e=toInputDate(dates[dates.length-1]);
+      document.getElementById('date-start').value=s;
+      document.getElementById('date-end').value=e;
+      document.getElementById('top-date-start').value=s;
+      document.getElementById('top-date-end').value=e;
     }
-  };
-
-  function onLoadError() {
+  } catch(e) {
     document.getElementById('data-badge').innerHTML=
       `<i class="fa-solid fa-triangle-exclamation" style="font-size:10px;color:var(--red);margin-right:4px;"></i>Sheet not accessible`;
     showToast('Make sure the sheet is shared as "Anyone with the link → Viewer"', true);
   }
-
-  const script = document.createElement('script');
-  script.src = url;
-  script.onerror = onLoadError;
-  document.head.appendChild(script);
 }
 
 function toInputDate(s) { const d=new Date(s); return isNaN(d)?'':d.toISOString().slice(0,10); }
